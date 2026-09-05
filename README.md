@@ -1,70 +1,70 @@
-# 苍穹外卖
+# Sky Takeout
 
-苍穹外卖学习项目，使用单仓库管理 Java 后端、Vue 管理端和 uni-app 微信小程序。
+Sky Takeout is a learning project that uses a monorepo to manage a Java backend, a Vue admin dashboard, and a uni-app WeChat Mini Program.
 
-## 项目结构
+## Project Structure
 
 ```text
 sky-take-out/
-├── sky-common/       # 后端公共模块
-├── sky-pojo/         # 实体、DTO 和 VO
-├── sky-server/       # Spring Boot 服务，端口 8080
-├── sky-admin-vue/    # Vue 2 管理端，端口 8888
-└── sky-miniprogram/  # uni-app 微信小程序
+├── sky-common/       # Shared backend module
+├── sky-pojo/         # Entities, DTOs, and VOs
+├── sky-server/       # Spring Boot service (port 8080)
+├── sky-admin-vue/    # Vue 2 admin dashboard (port 8888)
+└── sky-miniprogram/  # uni-app WeChat Mini Program
 ```
 
-## 本地环境
+## Prerequisites
 
-- JDK 17（项目以 Java 8 为编译目标）
+- JDK 17 (the project targets Java 8 bytecode)
 - Maven 3.9+
 - MySQL
 - Redis
 - Node.js 16.20.2
-- 微信开发者工具；开发小程序源码时还需要 HBuilderX
+- WeChat DevTools; HBuilderX is also required to work with the Mini Program source code
 
-## 启动顺序
+## Startup Order
 
 ```text
-MySQL -> Redis -> Java 后端 -> Vue 管理端 -> 微信小程序
+MySQL -> Redis -> Java backend -> Vue admin dashboard -> WeChat Mini Program
 ```
 
-### 1. 配置数据库和外部服务
+### 1. Configure the Database and External Services
 
-复制配置模板：
+Copy the configuration template:
 
 ```bash
 cp sky-server/src/main/resources/application-dev.example.yml \
    sky-server/src/main/resources/application-dev.yml
 ```
 
-然后在 `application-dev.yml` 中填写本机 MySQL、Redis、OSS 和微信配置。该文件已被 Git 忽略，不会提交真实凭据。
+Then add your local MySQL, Redis, OSS, and WeChat settings to `application-dev.yml`. This file is ignored by Git, so real credentials will not be committed.
 
-数据库名称为 `sky_take_out`。首次运行可执行：
+The database name is `sky_take_out`. Run the following command for the initial setup:
 
 ```bash
 /usr/local/mysql/bin/mysql -u root -p < docs/sql/sky.sql
 ```
 
-该脚本会重建项目数据表，仅适合初始化空数据库；已有数据时请先备份。
+This script recreates the project's database tables and should only be used to initialize an empty database. Back up any existing data before running it.
 
-### 2. 启动后端
+### 2. Start the Backend
 
-在项目根目录执行：
+Run the following commands from the project root:
 
 ```bash
 mvn -pl sky-server -am install -Dmaven.test.skip=true
 mvn -pl sky-server spring-boot:run
 ```
 
-看到 `Started SkyApplication` 后，通过下面的命令验证：
+After `Started SkyApplication` appears in the terminal, verify the backend with:
 
 ```bash
 curl http://localhost:8080/user/shop/status
 ```
 
-### 3. 启动管理端
+### 3. Start the Admin Dashboard
 
-新建终端并执行：
+Open a new terminal and run:
 
 ```bash
 cd sky-admin-vue
@@ -74,16 +74,16 @@ npm install --legacy-peer-deps
 npm run serve
 ```
 
-访问 <http://localhost:8888>，默认账号为 `admin`，默认密码为 `123456`。
+Open <http://localhost:8888>. The default username is `admin`, and the default password is `123456`.
 
-不要运行 `npm audit fix --force`，旧版 Vue 2 项目可能因强制升级依赖而无法启动。
+Do not run `npm audit fix --force`. Forced dependency upgrades may prevent this legacy Vue 2 project from starting.
 
-### 4. 启动微信小程序
+### 4. Start the WeChat Mini Program
 
-`sky-miniprogram` 是 uni-app 项目，可使用 HBuilderX 打开并运行到微信开发者工具。运行本地后端前，需要将 `sky-miniprogram/utils/env.js` 中的 `baseUrl` 改为本机可访问的后端地址。
+`sky-miniprogram` is a uni-app project. Open it with HBuilderX and run it in WeChat DevTools. Before connecting it to the local backend, change `baseUrl` in `sky-miniprogram/utils/env.js` to a backend address accessible from the Mini Program.
 
-微信开发者工具模拟器可使用 `http://localhost:8080`；真机调试需要使用电脑局域网 IP 或 HTTPS 公网地址。
+The WeChat DevTools simulator can use `http://localhost:8080`. Testing on a physical device requires your computer's LAN IP address or a public HTTPS address.
 
-## 停止服务
+## Stopping the Services
 
-在运行后端或管理端的终端中按 `Control + C` 即可停止对应服务。
+Press `Control + C` in the terminal running the backend or admin dashboard to stop that service.

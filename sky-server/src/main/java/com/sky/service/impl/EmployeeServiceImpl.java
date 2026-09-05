@@ -9,10 +9,12 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
+import com.sky.exception.PasswordEditFailedException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
@@ -20,7 +22,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -114,6 +118,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
+    }
+
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        if (passwordEditDTO == null
+                || !StringUtils.hasText(passwordEditDTO.getOldPassword())
+                || !StringUtils.hasText(passwordEditDTO.getNewPassword())) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
+        }
+
+        Long employeeId = BaseContext.getCurrentId();
+        Employee employee = employeeMapper.getById(employeeId);
+        if (employee == null) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
+        }
+
+        String oldPassword = DigestUtils.md5DigestAsHex(
+                passwordEditDTO.getOldPassword().getBytes(StandardCharsets.UTF_8));
+        if (!oldPassword.equals(employee.getPassword())) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_ERROR);
+        }
+
+        Employee updatedEmployee = new Employee();
+        updatedEmployee.setId(employeeId);
+        updatedEmployee.setPassword(DigestUtils.md5DigestAsHex(
+                passwordEditDTO.getNewPassword().getBytes(StandardCharsets.UTF_8)));
+        employeeMapper.update(updatedEmployee);
     }
 
 
