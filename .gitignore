@@ -1,0 +1,11 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+application-dev.yml
+
+.DS_Store
+**/.DS_Store
+report.*.json
