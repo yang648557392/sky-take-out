@@ -1,3 +1,4 @@
+SET NAMES utf8mb4;
 CREATE DATABASE  IF NOT EXISTS `sky_take_out` ;
 USE `sky_take_out`;
 

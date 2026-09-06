@@ -9,3 +9,4 @@ application-dev.yml
 .DS_Store
 **/.DS_Store
 report.*.json
+.env
