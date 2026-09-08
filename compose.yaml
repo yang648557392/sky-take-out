@@ -94,10 +94,7 @@ services:
         VUE_APP_SOCKET_URL: wss://skytakeout.yangmingzhe.com/ws/
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - "127.0.0.1:8082:80"
     depends_on:
       - backend
     networks:
