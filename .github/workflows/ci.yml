@@ -1,0 +1,35 @@
+name: Sky Take-Out CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download source code
+        uses: actions/checkout@v5
+
+      - name: Build backend Docker image
+        run: docker build -f deploy/backend.Dockerfile -t sky-take-out-backend:ci .
+
+  frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download source code
+        uses: actions/checkout@v5
+
+      - name: Build frontend Docker image
+        run: docker build -f deploy/frontend.Dockerfile -t sky-take-out-frontend:ci .
