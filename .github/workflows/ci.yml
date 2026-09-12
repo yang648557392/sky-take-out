@@ -10,6 +10,11 @@ on:
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/sky-take-out-backend
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/sky-take-out-frontend
 
 jobs:
   backend:
@@ -20,8 +25,23 @@ jobs:
       - name: Download source code
         uses: actions/checkout@v5
 
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: Build backend Docker image
-        run: docker build -f deploy/backend.Dockerfile -t sky-take-out-backend:ci .
+        run: |
+          docker build \
+            -f deploy/backend.Dockerfile \
+            -t "$BACKEND_IMAGE:${{ github.sha }}" \
+            -t "$BACKEND_IMAGE:latest" \
+            .
+
+      - name: Push backend Docker image
+        if: github.event_name == 'push'
+        run: |
+          docker push "$BACKEND_IMAGE:${{ github.sha }}"
+          docker push "$BACKEND_IMAGE:latest"
 
   frontend:
     name: Build Frontend
@@ -31,5 +51,20 @@ jobs:
       - name: Download source code
         uses: actions/checkout@v5
 
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: Build frontend Docker image
-        run: docker build -f deploy/frontend.Dockerfile -t sky-take-out-frontend:ci .
+        run: |
+          docker build \
+            -f deploy/frontend.Dockerfile \
+            -t "$FRONTEND_IMAGE:${{ github.sha }}" \
+            -t "$FRONTEND_IMAGE:latest" \
+            .
+
+      - name: Push frontend Docker image
+        if: github.event_name == 'push'
+        run: |
+          docker push "$FRONTEND_IMAGE:${{ github.sha }}"
+          docker push "$FRONTEND_IMAGE:latest"
