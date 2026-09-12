@@ -20,7 +20,11 @@ services:
       - mysql_data:/var/lib/mysql
       - ./docs/sql/sky.sql:/docker-entrypoint-initdb.d/01-sky.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent",
+        ]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -48,6 +52,7 @@ services:
       - app-network
 
   backend:
+    image: ghcr.io/yang648557392/sky-take-out-backend:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: deploy/backend.Dockerfile
@@ -87,6 +92,7 @@ services:
       - app-network
 
   frontend:
+    image: ghcr.io/yang648557392/sky-take-out-frontend:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: deploy/frontend.Dockerfile
